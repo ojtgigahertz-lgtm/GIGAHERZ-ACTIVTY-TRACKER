@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Gigahertz — Time Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --p:#1a3af5;--pd:#1228d4;--pl:rgba(26,58,245,0.1);
+  --sb: rgba(255, 255, 255, 0.85); 
+  --sbh: rgba(26, 58, 245, 0.08);
+  --sb-border: rgba(0,0,90,0.06);
+  --sb-tx: #0d1533;
+  --sb-tx2: #4a5270;
+  --sb-tx3: #8890aa;
+  --sb-tx4: #456df5;
+  
+  --bg: radial-gradient(circle at 75% 85%, rgba(255,255,255,0.9) 0%, transparent 20%),
+        radial-gradient(circle at 25% 90%, rgba(255,255,255,0.6) 0%, transparent 15%),
+        radial-gradient(circle at 85% 20%, rgba(147, 51, 234, 0.15) 0%, transparent 35%),
+        radial-gradient(circle at 10% 30%, rgba(26, 58, 245, 0.15) 0%, transparent 35%),
+        linear-gradient(135deg, #d4e2ff 0%, #ecdcf9 40%, #c4d6fa 100%);
+        
+  --wh:#fff;--card:rgba(255,255,255,0.9);
+  --tx:#0d1533;--tx2:#4a5270;--tx3:#8890aa;
+  --bd:#dde2f0;--danger:#ef4444;--dl:#fff0f0;
+  --ok:#16a34a;--warn:#d97706;
+  --sh:0 4px 24px rgba(26,58,245,.06);
+  --shl:0 12px 48px rgba(26,58,245,.12);
+  --r:16px;--rsm:10px;--rlg:20px;
+  --th:#f2f5ff;--ibg:#fff;
+}
+[data-theme="dark"]{
+  --p:#4d6fff;--pd:#3d5de8;--pl:rgba(77,111,255,0.15);
+  --sb: rgba(10, 15, 30, 0.85); 
+  --sbh: rgba(255, 255, 255, 0.06);
+  --sb-border: rgba(255,255,255,0.04);
+  --sb-tx: #dde4f5;
+  --sb-tx2: #7d8eaa;
+  --sb-tx3: #485268;
+  
+  --bg: radial-gradient(circle at 75% 85%, rgba(255,255,255,0.1) 0%, transparent 15%),
+        radial-gradient(circle at 25% 90%, rgba(255,255,255,0.05) 0%, transparent 10%),
+        radial-gradient(circle at 85% 20%, rgba(147, 51, 234, 0.2) 0%, transparent 30%),
+        radial-gradient(circle at 10% 30%, rgba(26, 58, 245, 0.2) 0%, transparent 30%),
+        linear-gradient(135deg, #0f152e 0%, #1a122e 40%, #0a0f24 100%);
+        
+  --wh:#111827;--card:rgba(19,29,48,0.9);
+  --tx:#dde4f5;--tx2:#7d8eaa;--tx3:#485268;
+  --bd:#1e2a44;--danger:#f87171;--dl:#2d1117;
+  --ok:#4ade80;--warn:#fbbf24;
+  --sh:0 4px 24px rgba(0,0,0,.4);--shl:0 12px 48px rgba(0,0,0,.6);
+  --th:#0e1526;--ibg:#0e1526;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);background-attachment:fixed;color:var(--tx);min-height:100vh;transition:background .3s ease,color .3s ease;}
+body::before {content: '';position: fixed;inset: 0;background-image:url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M-200,600 C300,300 800,800 1300,400 C1800,0 2200,500 2500,400' fill='none' stroke='rgba(255,255,255,0.8)' stroke-width='3' filter='blur(4px)'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M-200,700 C400,900 700,200 1400,600 C2000,1000 2300,300 2600,500' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='6' filter='blur(8px)'/%3E%3C/svg%3E"),radial-gradient(circle at 60% 40%, rgba(255,255,255,0.8) 0px, transparent 4px),radial-gradient(circle at 20% 70%, rgba(255,255,255,0.6) 0px, transparent 3px),radial-gradient(circle at 80% 80%, rgba(255,255,255,0.9) 0px, transparent 5px);background-size: cover;background-position: center;z-index: -1;pointer-events: none;}
+[data-theme="dark"] body::before { opacity: 0.15; }
+input,select,button,textarea{font-family:inherit;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:99px;}
+*:focus-visible { outline: 2px solid var(--p); outline-offset: 2px; border-radius: 4px;}
+
+.auth-wrap{min-height:100vh;background:transparent;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden; padding:20px;}
+.auth-card{background:var(--wh);border-radius:var(--rlg);padding:42px 38px;width:100%;max-width:460px;box-shadow:var(--shl);position:relative;z-index:1;border:1px solid var(--bd); max-height: 90vh; overflow-y: auto;}
+.auth-logo{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:26px}
+.auth-title{font-size:22px;font-weight:800;color:var(--tx);text-align:center;margin-bottom:4px}
+.auth-sub{font-size:13px;color:var(--tx2);text-align:center;margin-bottom:26px}
+.form-group{margin-bottom:14px; position: relative;}
+.form-label{font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:5px;display:block;letter-spacing:.05em;text-transform:uppercase}
+.form-input{width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:var(--rsm);font-size:14px;color:var(--tx);background:var(--ibg);outline:none;transition:all .2s ease}
+.form-input:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(26,58,245,.12)}
+.form-input::placeholder{color:var(--tx3)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 20px;border-radius:var(--rsm);border:none;cursor:pointer;font-size:14px;font-weight:700;transition:all .2s ease}
+.btn-p{background:var(--p);color:#fff;width:100%;box-shadow: 0 4px 14px rgba(26,58,245,.2);}.btn-p:hover{background:var(--pd); transform: translateY(-1px);}.btn-p:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{filter:brightness(.9)}
+.btn-ghost{background:transparent;color:var(--tx2);border:1.5px solid var(--bd)}.btn-ghost:hover{background:var(--bg);color:var(--tx)}
+.auth-link{font-size:13px;color:var(--tx2);text-align:center;margin-top:14px}
+.auth-link a{color:var(--p);font-weight:700;text-decoration:none;cursor:pointer}
+.err-box{background:var(--dl);color:var(--danger);border:1px solid rgba(239,68,68,.3);padding:10px 13px;border-radius:var(--rsm);font-size:13px;margin-bottom:13px}
+.pw-wrapper { position: relative; display: flex; width: 100%; }
+.pw-toggle-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--tx3); display: flex; padding: 4px; border-radius: 4px; transition: .2s; }
+.pw-toggle-btn:hover { background: var(--bg); color: var(--tx); }
+
+.layout{display:flex;min-height:100vh;position:relative;}
+.sidebar{width:270px;height:100vh;background:var(--sb); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;border-right:1px solid var(--sb-border); transition:transform 0.3s ease;}
+.sb-logo{padding:24px 20px 10px 20px;display:flex;align-items:center;justify-content:center;}
+.sb-logo img {width: 100%; max-height: 60px; object-fit: contain; mix-blend-mode: multiply;}
+[data-theme="dark"] .sb-logo img { filter: invert(1) grayscale(1) contrast(2); mix-blend-mode: screen; }
+.sb-nav{flex:1;padding:20px 16px;display:flex;flex-direction:column;gap:6px; overflow-y:auto;}
+.sb-nav::-webkit-scrollbar{width:5px;}
+.sb-nav::-webkit-scrollbar-track{background:transparent;}
+.sb-nav::-webkit-scrollbar-thumb{background:var(--sb-tx3); border-radius:99px;}
+.nav-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:12px;cursor:pointer;color:var(--sb-tx2);font-size:14.5px;font-weight:600;transition:all 0.2s ease; border: 1px solid transparent;}
+.nav-item:hover{background:var(--sbh);color:var(--sb-tx);}
+.nav-item.active{background:var(--pl);color:var(--p);border: 1px solid rgba(26,58,245,0.15);font-weight:700;}
+[data-theme="dark"] .nav-item.active{border-color:rgba(255,255,255,0.1);}
+.nav-item svg{flex-shrink:0;width:20px;height:20px;stroke-width:2.2;}
+.sb-bottom{padding:20px 16px;display:flex;flex-direction:column;gap:16px;}
+.theme-picker{display:flex;align-items:center;justify-content:center;gap:10px; padding-bottom: 8px;}
+.theme-circle{width:20px;height:20px;border-radius:50%;cursor:pointer;transition:transform 0.2s, box-shadow 0.2s; border:2px solid transparent;}
+.theme-circle:hover{transform:scale(1.15);}
+.theme-circle.active{border-color:var(--tx);transform:scale(1.15);box-shadow:0 4px 8px rgba(0,0,0,0.15);}
+.sb-user{padding:14px 16px;background:var(--pl);border:1px solid rgba(26,58,245,.15);border-radius:14px;display:flex;align-items:center;gap:14px;}
+[data-theme="dark"] .sb-user{border-color:rgba(255,255,255,0.08);}
+.user-avatar{width:38px;height:38px;border-radius:50%;background:var(--p);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:800;flex-shrink:0;box-shadow:0 4px 12px rgba(26,58,245,.25);}
+.user-info{flex:1;min-width:0;}
+.user-name{display:block;color:var(--sb-tx);font-size:13.5px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.2; margin-bottom:6px;}
+.user-details{display:flex;flex-wrap:wrap;gap:4px;}
+.user-detail-tag{font-size:9px;font-weight:800;padding:3px 6px;border-radius:4px;background:rgba(255,255,255,0.6);color:var(--p);white-space:nowrap;text-transform:uppercase;letter-spacing:0.05em;border:1px solid rgba(26,58,245,.1);}
+[data-theme="dark"] .user-detail-tag{background:rgba(0,0,0,0.3);color:var(--p);}
+.action-btn{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-radius:12px;cursor:pointer;background:transparent;border:none;width:100%;transition:all 0.2s ease;}
+.action-btn:hover{background:var(--sbh);}
+.action-btn-left {display:flex;align-items:center;gap:14px;color:var(--sb-tx2);font-size:14.5px;font-weight:600;}
+.action-btn svg{flex-shrink:0;width:20px;height:20px;}
+.logout-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;border-radius:12px;cursor:pointer;color:#fff;font-size:15px;font-weight:700;background:var(--p);border:none;width:100%;transition:all 0.2s ease;box-shadow: 0 4px 14px rgba(26,58,245,.2);}
+.logout-btn:hover{filter:brightness(0.9);transform:translateY(-1px);box-shadow:0 6px 16px rgba(26,58,245,.35);}
+.logout-btn img{width:20px;height:20px;object-fit:contain; filter: brightness(0) invert(1);}
+.notif-panel {position:absolute; bottom:100%; left:50%; transform:translateX(-50%); width:270px; background:var(--card); border:1px solid var(--bd); border-radius:10px; box-shadow:0 12px 48px rgba(0,0,0,.15); padding:12px; display:none; max-height:280px; overflow-y:auto; z-index:1001; animation:slideUp 0.2s ease;}
+.action-btn-wrap:focus-within .notif-panel {display:block;}
+.notif-item {font-size:11px; padding:10px; border-bottom:1px solid var(--bd); color:var(--tx); line-height:1.5;}
+.notif-item:last-child {border-bottom:none;}
+.notif-time {font-size:9px; color:var(--tx3); margin-top:4px; font-weight:500;}
+.notif-badge {background:var(--danger); color:#fff; font-size:11px; font-weight:800; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(239,68,68,.3);}
+
+@keyframes slideUp { from{opacity:0;transform:translateX(-50%) translateY(8px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
+
+.main{margin-left:270px;flex:1;min-height:100vh;transition:margin-left 0.3s ease; display:flex; flex-direction:column;}
+.page{padding:30px 34px;max-width:1120px; width:100%; margin: 0 auto; flex:1;}
+.page-hdr{margin-bottom:24px; display:flex; justify-content:space-between; align-items:flex-end;}
+.page-title{font-size:26px;font-weight:800;color:var(--tx); letter-spacing:-0.5px; display:flex; align-items:center; gap:10px;}
+.page-sub{font-size:13px;color:var(--tx2);margin-top:4px}
+.page-date{font-size:12.5px;color:var(--tx2);margin-top:4px;display:flex;align-items:center;gap:5px; font-weight:600; background: var(--pl); color: var(--p); padding: 4px 12px; border-radius: 99px;}
+
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.stat-card, .track-section, .recent-section, .chart-card, .table-wrap { background: var(--card); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-radius: var(--rlg); box-shadow: var(--sh); padding:22px 24px; border:1px solid var(--bd); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shl); }
+.stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.stat-lbl{font-size:11.5px;color:var(--tx2);font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+.stat-val{font-size:28px;font-weight:800;color:var(--p);line-height:1; letter-spacing:-1px;}
+.stat-sub{font-size:11.5px;color:var(--tx3);margin-top:6px; font-weight:500;}
+.stat-clock{font-size:28px;font-weight:800;color:var(--p);font-variant-numeric:tabular-nums;letter-spacing:-.5px;line-height:1}
+.stat-live{display:flex;align-items:center;gap:6px;margin-top:6px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pulse 1.4s ease infinite}
+
+.track-title{font-size:15px;font-weight:800;color:var(--tx);margin-bottom:4px}
+.track-sub{font-size:12.5px;color:var(--tx2);margin-bottom:16px}
+.track-row{display:flex;gap:10px;align-items:center; flex-wrap:wrap;}
+.track-select{flex:1;min-width:180px;padding:11px 14px;border:1.5px solid var(--bd);border-radius:var(--rsm);font-size:13.5px;color:var(--tx);background:var(--ibg);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%238890aa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center; font-weight:500;}
+.track-select:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(26,58,245,.12)}
+.start-btn{padding:11px 20px;background:var(--p);color:#fff;border:none;border-radius:var(--rsm);font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;transition:.2s; box-shadow: 0 4px 14px rgba(26,58,245,.2);}
+.start-btn:hover{background:var(--pd); transform: translateY(-1px);}
+.custom-row{display:flex;gap:10px;margin-top:12px;align-items:center; flex-wrap:wrap;}
+.custom-input{flex:1;min-width:150px;padding:10px 14px;border:1.5px solid var(--bd);border-radius:var(--rsm);font-size:13.5px;color:var(--tx);background:var(--ibg);outline:none;transition:.2s; font-weight:500;}
+.custom-input:focus{border-color:var(--p)}
+.add-btn{padding:10px 18px;background:transparent;border:1.5px solid var(--p);color:var(--p);border-radius:var(--rsm);font-size:13.5px;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap}
+.add-btn:hover{background:var(--pl);}
+.timer-active{background:linear-gradient(135deg,#08122e 0%,#050d22 100%);border-radius:var(--rlg);padding:24px 26px;position:relative;overflow:hidden;border:1px solid rgba(26,58,245,.3); box-shadow: 0 10px 40px rgba(8,18,46,.4);}
+.timer-active::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 75% 25%,rgba(26,58,245,.4) 0%,transparent 60%);pointer-events:none}
+.timer-lbl{font-size:11px;font-weight:800;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.15em;margin-bottom:8px}
+.timer-task{font-size:19px;font-weight:800;color:#fff;margin-bottom:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.timer-digits-row{display:flex;align-items:flex-end;gap:4px;margin-bottom:6px}
+.timer-digits{font-size:56px;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-2px}
+.timer-digits.paused {color: rgba(255,255,255,.5);}
+.timer-unit{font-size:10.5px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:10px;letter-spacing:.08em}
+.timer-sep{font-size:46px;font-weight:300;color:rgba(255,255,255,.3);line-height:1;margin-bottom:4px}
+.timer-meta{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.timer-dot{width:8px;height:8px;background:#4ade80;border-radius:50%;flex-shrink:0}
+.timer-dot.active{animation:pulse 1.3s ease infinite;}
+.timer-dot.paused{background:#fbbf24;}
+.timer-meta-txt{font-size:11.5px;font-weight:700;color:rgba(255,255,255,.5)}
+.timer-bar-wrap{width:100%;height:4px;background:rgba(255,255,255,.1);border-radius:99px;margin-bottom:16px;overflow:hidden}
+.timer-bar{height:100%;background:linear-gradient(90deg,var(--p),#4ade80);border-radius:99px;transition:width 1s linear}
+.timer-bar.paused{background:#fbbf24;}
+.timer-actions{display:flex;gap:10px;}
+.pause-btn{flex:1;padding:12px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:var(--rsm);font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s}
+.pause-btn:hover{background:rgba(255,255,255,.15);}
+.stop-btn{flex:2;padding:12px;background:var(--danger);color:#fff;border:none;border-radius:var(--rsm);font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s; box-shadow: 0 4px 14px rgba(239,68,68,.3);}
+.stop-btn:hover{filter:brightness(.9);transform:translateY(-1px)}
+
+.queue-section{margin-bottom:22px;}
+.queue-clear-btn{background:transparent; border:none; color:var(--tx3); font-size:11px; cursor:pointer; font-weight:600;}
+.queue-clear-btn:hover{color:var(--danger); text-decoration:underline;}
+.queue-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--pl);border-radius:var(--rsm);border:1px solid rgba(26,58,245,.15);margin-bottom:10px;}
+.queue-task-name{font-size:13.5px;font-weight:700;color:var(--p);}
+.queue-start-btn{padding:6px 14px;background:var(--p);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;transition:.2s}
+.queue-start-btn:hover{background:var(--pd);}
+.queue-del-btn{background:none; border:none; cursor:pointer; color:var(--tx3); padding:4px; margin-left: 4px; border-radius:4px;}
+.queue-del-btn:hover{color:var(--danger); background:var(--dl);}
+
+.recent-section{padding:0; overflow:hidden;}
+.sec-hdr{padding:18px 24px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between; background:rgba(255,255,255,0.3); border-radius:var(--rlg) var(--rlg) 0 0; flex-wrap:wrap; gap:10px;}
+.sec-title{font-size:14px;font-weight:800;color:var(--tx)}
+.search-recent{padding:6px 12px; border-radius:100px; border:1px solid var(--bd); background:var(--ibg); font-size:11.5px; outline:none; color:var(--tx); min-width:180px; flex:1;}
+.search-recent:focus{border-color:var(--p);}
+.recent-list{max-height: 350px; overflow-y: auto; padding-bottom: 10px;}
+.task-row{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--bd);transition:.2s ease}
+.task-row:last-child{border-bottom:none}
+.task-row:hover{background:var(--pl)}
+.task-cat-dot{width:10px;height:10px;border-radius:50%;margin-right:12px;flex-shrink:0;}
+.task-info{display:flex;align-items:center; flex:1;}
+.task-name{font-size:13.5px;font-weight:700;color:var(--tx);margin-bottom:2px}
+.task-time{font-size:11.5px;color:var(--tx2); font-weight:500;}
+.dur-badge{background:var(--pl);color:var(--p);padding:5px 12px;border-radius:99px;font-size:11.5px;font-weight:800;white-space:nowrap}
+.tm-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.total-badge{display:inline-flex;align-items:center;gap:6px;background:var(--pl);color:var(--p);padding:8px 16px;border-radius:99px;font-size:13.5px;font-weight:800; box-shadow:var(--sh);}
+.date-filter{display:flex;align-items:center;gap:8px;background:var(--card);padding:8px 14px;border-radius:var(--rsm);box-shadow:var(--sh);border:1px solid var(--bd)}
+.date-filter input{border:none;outline:none;font-size:13.5px;color:var(--tx);background:transparent;font-family:inherit;font-weight:700;}
+.table-wrap{padding:0; max-height: calc(100vh - 250px); overflow-x: auto; overflow-y: auto;}
+.gh-table{width:100%;border-collapse:collapse; min-width: 600px;}
+.gh-table th{position:sticky; top:0; z-index:10; background:var(--bg); padding:14px 20px; text-align:left; font-size:11px; font-weight:800; color:var(--tx2); text-transform:uppercase; letter-spacing:.08em; border-bottom:1px solid var(--bd); box-shadow: 0 1px 0 var(--bd);}
+.gh-table td{padding:14px 20px;font-size:13.5px;color:var(--tx);border-bottom:1px solid var(--bd); font-weight:500;}
+.gh-table tr:last-child td{border-bottom:none}
+.gh-table tr:hover td{background:var(--pl)}
+.analytics-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px}
+.chart-card{padding:24px;}
+.chart-title{font-size:14px;font-weight:800;color:var(--tx);margin-bottom:4px}
+.chart-sub{font-size:12px;color:var(--tx2);margin-bottom:20px; font-weight:500;}
+
+.profile-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; align-items: start; }
+.avatar-wrapper { position: relative; width: 130px; height: 130px; margin: 0 auto 20px; }
+.avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 4px solid var(--p); background: var(--bg); box-shadow: var(--sh); }
+.avatar-btn { position: absolute; bottom: 0; right: 0; background: var(--p); color: #fff; border: 2px solid var(--wh); border-radius: 50%; width: 38px; height: 38px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shl); transition: .2s; }
+.avatar-btn:hover { background: var(--pd); transform: scale(1.05); }
+.avatar-btn.locked { background: var(--bd); color: var(--tx3); cursor: not-allowed; border-color: var(--bd); }
+.avatar-btn.locked:hover { transform: none; }
+
+.modal-overlay {position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:3000;backdrop-filter:blur(4px);}
+.modal-card {background:var(--card);padding:30px;border-radius:var(--rlg);width:100%;max-width:400px;border:1px solid var(--bd);box-shadow:var(--shl);}
+
+.idle-overlay{position:fixed;inset:0;background:rgba(0,0,30,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:2000;animation:fadeIn .2s ease; padding: 20px;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.idle-card{background:var(--wh);border-radius:24px;padding:38px 34px;width:100%;max-width:420px;text-align:center;box-shadow:0 24px 80px rgba(0,0,50,.3);animation:popIn .3s cubic-bezier(.34,1.56,.64,1);border:1px solid var(--bd)}
+@keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.idle-icon{width:72px;height:72px;background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:34px; box-shadow: 0 8px 20px rgba(245,158,11,.2);}
+.idle-title{font-size:20px;font-weight:800;color:var(--tx);margin-bottom:8px}
+.idle-msg{font-size:13.5px;color:var(--tx2);line-height:1.6;margin-bottom:6px; font-weight:500;}
+.idle-time{font-size:42px;font-weight:800;color:var(--warn);margin:10px 0 20px;font-variant-numeric:tabular-nums;letter-spacing:-2px; line-height:1;}
+.idle-btns{display:flex;gap:12px; flex-wrap:wrap;}
+.idle-here{flex:1;min-width:120px;padding:14px;background:var(--p);color:#fff;border:none;border-radius:var(--rsm);font-size:14px;font-weight:700;cursor:pointer;transition:.2s; box-shadow: 0 4px 14px rgba(26,58,245,.2);}
+.idle-here:hover{background:var(--pd); transform: translateY(-1px);}
+.idle-out{flex:1;min-width:120px;padding:14px;background:var(--bg);color:var(--tx2);border:1.5px solid var(--bd);border-radius:var(--rsm);font-size:13px;font-weight:700;cursor:pointer;transition:.2s;line-height:1.4}
+.idle-out:hover{background:var(--bd); color:var(--tx);}
+.idle-prog-wrap{width:100%;height:4px;background:var(--bd);border-radius:99px;margin-top:20px;overflow:hidden}
+.idle-prog-fill{height:100%;border-radius:99px;transition:width 1s linear}
+.tracker-badge {
+  position: fixed; bottom: 16px; left: 280px; z-index: 9000;
+  background: var(--card); border: 1px solid var(--bd);
+  border-radius: 99px; padding: 6px 14px;
+  font-size: 10px; font-weight: 700; color: var(--tx3);
+  display: flex; align-items: center; gap: 6px;
+  box-shadow: var(--sh); transition: opacity .3s;
+  pointer-events: none;
+}
+.tracker-badge.syncing { color: var(--p); border-color: rgba(26,58,245,.3); }
+.tracker-badge.success { color: var(--ok); border-color: rgba(22,163,74,.3); }
+.tracker-badge.error   { color: var(--danger); border-color: rgba(239,68,68,.3); }
+.tracker-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--tx3); }
+.tracker-badge.syncing .tracker-dot { background: var(--p); animation: pulse 1s infinite; }
+.tracker-badge.success .tracker-dot { background: var(--ok); }
+.tracker-badge.error   .tracker-dot { background: var(--danger); }
+.notif{position:fixed;bottom:24px;right:24px;background:var(--tx);color:var(--bg);padding:14px 20px;border-radius:var(--rsm);font-size:13.5px;font-weight:700;box-shadow:var(--shl);z-index:9999;animation:notifIn .3s cubic-bezier(0.34, 1.56, 0.64, 1)}
+.notif.success{background:#15803d;color:#fff}.notif.error{background:#ef4444;color:#fff}
+@keyframes notifIn{from{transform:translateY(24px) scale(0.9);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.empty-state{text-align:center;padding:48px 20px;color:var(--tx2)}
+.empty-state svg{opacity:.3;margin-bottom:12px}.empty-state p{font-size:14px; font-weight:600;}
+.spinner{width:20px;height:20px;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+
+.mobile-toggle { display: none; background: transparent; color: var(--tx); border: 1px solid var(--bd); padding: 8px 12px; border-radius: var(--rsm); font-size: 18px; cursor: pointer; }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; }
+
+@media (max-width: 1024px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .profile-grid { grid-template-columns: 1fr; }
+  .dashboard-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 768px) {
+  .mobile-toggle { display: block; }
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay.open { display: block; }
+  .main { margin-left: 0; }
+  .stat-grid, .analytics-stats { grid-template-columns: 1fr; }
+  .page { padding: 20px 16px; }
+  .page-hdr { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .page-hdr > div:last-child { width: 100%; justify-content: space-between; }
+  .timer-digits { font-size: 40px; }
+  .tracker-badge { left: 16px; }
+  .notif { left: 16px; right: 16px; text-align: center; bottom: 16px; }
+  .two-col { grid-template-columns: 1fr; }
+}
+@media print {
+  .sidebar, .auth-wrap, .timer-active, .track-section, .idle-overlay, .modal-overlay, .notif, .mobile-toggle { display: none !important; }
+  .main { margin-left: 0 !important; }
+  body { background: #fff !important; color: #000 !important; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+window.safeStorage = {
+  getItem: function(key) { try { return window.localStorage.getItem(key); } catch(e) { return null; } },
+  setItem: function(key, val) { try { window.localStorage.setItem(key, val); } catch(e) {} },
+  removeItem: function(key) { try { window.localStorage.removeItem(key); } catch(e) {} }
+};
+
+window.trackerParse = function(val, fallback) {
+  if (!val) return fallback;
+  try { return JSON.parse(val); } catch(e) { return fallback; }
+};
+
+window.cStr = function(s) {
+  return (s || '').toString().replace(/^'/, '');
+};
+
+window.ActivityTracker = (() => {
+  let _user       = null;
+  let _page       = 'login';
+  let _sessionId  = 'sess_' + Math.random().toString(36).slice(2, 10);
+  let _queue      = [];
+  let _flushTimer = null;
+  let _badgeEl    = null;
+  let _badgeTimer = null;
+  let _flushing   = false;
+
+  const FLUSH_INTERVAL = 4000;
+  const MAX_QUEUE      = 15;
+
+  function showBadge(state, text) {
+    if (!_badgeEl) return;
+    _badgeEl.className = `tracker-badge ${state}`;
+    _badgeEl.querySelector('.tracker-label').textContent = text;
+    _badgeEl.style.opacity = '1';
+    clearTimeout(_badgeTimer);
+    _badgeTimer = setTimeout(() => { if (_badgeEl) _badgeEl.style.opacity = '0'; }, 3500);
+  }
+
+  function createBadge() {
+    _badgeEl = document.createElement('div');
+    _badgeEl.className = 'tracker-badge';
+    _badgeEl.innerHTML = '<div class="tracker-dot"></div><span class="tracker-label">Tracker ready</span>';
+    _badgeEl.style.opacity = '0';
+    document.body.appendChild(_badgeEl);
+  }
+
+  function push(action, details, extra) {
+    extra = extra || {};
+    const event = {
+      timestamp : new Date().toISOString(),
+      userId    : _user && _user.id    ? _user.id    : '',
+      empId     : _user && _user.empId ? _user.empId : '',
+      dept      : _user && _user.dept  ? _user.dept  : '',
+      action    : action,
+      details   : String(details || '').slice(0, 200),
+      page      : _page,
+      element   : extra.element  || '',
+      duration  : extra.duration != null ? String(extra.duration) : '',
+      userAgent : navigator.userAgent.slice(0, 120),
+      sessionId : _sessionId,
+      status    : 'SUCCESS'
+    };
+    _queue.push(event);
+    if (_queue.length >= MAX_QUEUE) flush();
+  }
+
+  async function flush() {
+    if (_flushing || _queue.length === 0) return;
+    const batch = _queue.splice(0);
+    _flushing = true;
+    showBadge('syncing', 'Syncing ' + batch.length + ' event(s)...');
+
+    if (typeof google !== 'undefined' && google.script) {
+      google.script.run
+        .withSuccessHandler((res) => {
+          showBadge('success', '✓ ' + batch.length + ' event(s) synced');
+          _flushing = false;
+        })
+        .withFailureHandler((err) => {
+          _queue.unshift.apply(_queue, batch);
+          showBadge('error', 'Sync failed — will retry');
+          _flushing = false;
+        })
+        .batchLogActivities({ events: batch });
+    } else {
+      _queue.unshift.apply(_queue, batch);
+      _flushing = false;
+    }
+  }
+
+  function startAutoFlush() {
+    clearInterval(_flushTimer);
+    _flushTimer = setInterval(flush, FLUSH_INTERVAL);
+  }
+
+  function attachDOMListeners() {
+    document.addEventListener('click', function(e) {
+      var el = e.target.closest('button, a[href], [role="button"], .nav-item, .queue-start-btn, .queue-del-btn, .start-btn, .stop-btn, .pause-btn');
+      if (!el) return;
+      var raw = (el.innerText || el.getAttribute('title') || el.getAttribute('aria-label') || el.className || 'icon').replace(/\s+/g, ' ').trim().slice(0, 80);
+      push('CLICK', 'Clicked: "' + raw + '"', { element: el.tagName.toLowerCase() });
+    }, true);
+    document.addEventListener('change', function(e) {
+      var el = e.target;
+      if (!['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName)) return;
+      var label = (el.placeholder || el.name || el.id || el.type || 'field').slice(0, 40);
+      var val   = el.type === 'password' ? '[hidden]' : el.type === 'checkbox' ? (el.checked ? 'checked' : 'unchecked') : String(el.value).slice(0, 60);
+      push('INPUT_CHANGE', el.tagName + ' "' + label + '" -> "' + val + '"', { element: el.tagName.toLowerCase() });
+    }, true);
+  }
+
+  return {
+    init: function(user) { _user = user || null; createBadge(); startAutoFlush(); attachDOMListeners(); push('APP_INIT', 'Activity tracker initialized. Session: ' + _sessionId); },
+    setUser: function(user) { _user = user; },
+    clearUser: function()   { _user = null; },
+    setPage: function(page) { _page = page; push('PAGE_VIEW', 'Navigated to: ' + page); },
+    login: function(user) { _user = user; push('LOGIN', 'Login: ' + user.empId + ' | dept: ' + user.dept); },
+    loginFailed: function(empId) { push('LOGIN_FAILED', 'Failed login attempt: ' + empId); },
+    logout: function() { push('LOGOUT', 'Logout: ' + (_user && _user.empId ? _user.empId : 'unknown')); _user = null; },
+    timerStart: function(taskName) { push('TIMER_START', 'Started timer: "' + taskName + '"'); },
+    timerPause: function(taskName) { push('TIMER_PAUSE', 'Paused timer: "' + taskName + '"'); },
+    timerResume: function(taskName) { push('TIMER_RESUME', 'Resumed timer: "' + taskName + '"'); },
+    timerStop: function(taskName, elapsedSecs) { var mins = Math.round(elapsedSecs / 60); push('TIMER_STOP', 'Stopped timer: "' + taskName + '" | ' + mins + ' min', { duration: elapsedSecs }); },
+    taskSaved: function(taskName, mins) { push('TASK_SAVED', 'Task saved: "' + taskName + '" | ' + mins + ' min'); },
+    taskQueued: function(taskName) { push('TASK_QUEUED', 'Queued: "' + taskName + '"'); },
+    taskDequeued: function(taskName) { push('TASK_DEQUEUED', 'Removed from queue: "' + taskName + '"'); },
+    remarkUpdated: function(taskId) { push('REMARK_UPDATED', 'Remark updated for task: ' + taskId); },
+    idleWarning: function(secs) { push('IDLE_WARNING', 'Idle detected: ' + Math.round(secs / 60) + ' min'); },
+    idleDismissed: function(secs) { push('IDLE_DISMISSED', 'Returned after: ' + Math.round(secs / 60) + ' min idle'); },
+    idleOut: function(secs) { push('IDLE_OUT', 'Stepped away: ' + Math.round(secs / 60) + ' min idle'); },
+    photoUpdated: function() { push('PHOTO_UPDATED', 'Profile photo changed'); },
+    passwordChanged: function() { push('PASSWORD_CHANGED', 'User changed their password'); },
+    themeToggled: function(mode) { push('THEME_TOGGLE', 'Switched to: ' + mode + ' mode'); },
+    custom: function(action, detail, extra) { push(action, detail, extra); },
+    flush: flush,
+  };
+})();
+
+window.ActivityTracker.init(null);
+</script>
+
+<script type="text/babel">
+window.appParse = function(val, fallback) {
+  if (!val) return fallback;
+  try { return JSON.parse(val); } catch(e) { return fallback; }
+};
+
+const cStr = window.cStr;
+
+const EyeIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+);
+const EyeOffIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+);
+
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ══ DIRECT GOOGLE SHEETS API CONNECTION ══
+const api = {
+  login: (empId, password) => new Promise((resolve) => {
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(err => resolve({success:false, error:err.message})).loginUser({identifier: empId, password: password, method: 'id'});
+  }),
+  changePassword: (data) => new Promise((resolve) => {
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(err => resolve({success:false, error:err.message})).changePassword(data);
+  }),
+  getTasks: (data) => new Promise((resolve) => {
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(err => resolve({success:false, error:err.message})).getTasks(data);
+  }),
+  addTask: (data) => new Promise((resolve) => {
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(err => resolve({success:false, error:err.message})).addTask(data);
+  }),
+  updateTaskRemark: (data) => new Promise((resolve) => {
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(err => resolve({success:false, error:err.message})).updateTaskRemark(data);
+  }),
+  timerStart: (data) => new Promise((resolve) => {
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(err => resolve({success:false, error:err.message})).timerStart(data);
+  }),
+  timerStop: (data) => new Promise((resolve) => {
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(err => resolve({success:false, error:err.message})).timerStop(data);
+  }),
+  updatePhoto: (data) => new Promise((resolve) => {
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(err => resolve({success:false, error:err.message})).updatePhoto(data);
+  })
+};
+
+const todayStr  = () => new Date().toISOString().split('T')[0];
+const nowHHMM   = () => new Date().toTimeString().slice(0,5);
+const fmtMins   = (m) => `${String(Math.floor(m/60)).padStart(2,'0')}h ${String(Math.floor(m%60)).padStart(2,'0')}m`;
+const fmtHHMMSS = (s) => { if(s<0)s=0;const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; };
+const fmtDate12 = (d) => { if(!d)return'';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
+const fmt12     = (t) => { if(!t)return'';const [h,m]=t.split(':').map(Number);return `${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`; };
+const PRESET    = ['Admin Tasks','Client Call','Code Review','Documentation','Meeting','Planning & Strategy','Research','Testing','Training / Learning', 'Other'];
+
+const exportCSV = (headers, rows, filename) => {
+  const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+};
+
+const getCategoryColor = (name) => {
+  if(/code|dev|python|sql/i.test(name)) return '#3b82f6';
+  if(/bug|fix|error|issue/i.test(name)) return '#ef4444';
+  if(/meet|call|client|sync/i.test(name)) return '#10b981';
+  if(/doc|write|report/i.test(name)) return '#8b5cf6';
+  if(/test|qa|audit/i.test(name)) return '#f59e0b';
+  if(/design|ui|ux/i.test(name)) return '#ec4899';
+  if(/train|learn|study/i.test(name)) return '#06b6d4';
+  return 'var(--p)';
+};
+
+const useLiveClock = (startDate) => {
+  const [s,setS]=useState(startDate?Math.floor((Date.now()-new Date(startDate))/1000):0);
+  useEffect(()=>{ if(!startDate){setS(0);return;} const t=setInterval(()=>setS(Math.floor((Date.now()-new Date(startDate))/1000)),1000);return()=>clearInterval(t); },[startDate]);
+  return s;
+};
+
+const useRealTimeClock = () => {
+  const [time, setTime] = useState(new Date());
+  useEffect(() => { const timer = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(timer); }, []);
+  return time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+};
+
+const LOGO_URL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbPTtZwom3B0ZLIJZNusjlFz3ougRMWPHITQ&s";
+
+const Notif = ({msg,type,onDone}) => {
+  useEffect(()=>{const t=setTimeout(onDone,2900);return()=>clearTimeout(t);},[]);
+  return <div className={`notif ${type}`}>{msg}</div>;
+};
+const ErrBox = ({msg}) => msg ? <div className="err-box">{msg}</div> : null;
+
+// ══ LOGIN PAGE ══
+const LoginPage = ({onLogin, onForgot, darkMode, toggleDark}) => {
+  const [empIdInput, setEmpIdInput] = useState('');
+  const [pw, setPw]                 = useState('');
+  const [remember, setRemember]     = useState(false);
+  const [loading, setLoading]       = useState(false);
+  const [err, setErr]               = useState('');
+  const [showPw, setShowPw]         = useState(false);
+
+  useEffect(() => {
+    const savedId = window.safeStorage.getItem('gh_remember_id');
+    if (savedId) { setEmpIdInput(savedId); setRemember(true); }
+    window.ActivityTracker.setPage('login');
+  }, []);
+
+  const submit = async () => {
+    const identifier = empIdInput.trim().toUpperCase();
+    if (!identifier || !pw) { setErr('Please fill in all fields.'); return; }
+    setLoading(true); setErr('');
+    window.ActivityTracker.custom('LOGIN_ATTEMPT', 'Login attempt: ' + identifier);
+    const res = await api.login(identifier, pw);
+    setLoading(false);
+    if (res.success) {
+      if (remember) window.safeStorage.setItem('gh_remember_id', identifier);
+      else          window.safeStorage.removeItem('gh_remember_id');
+      onLogin(res.user);
+    } else {
+      setErr(res.error || 'Invalid credentials.');
+      window.ActivityTracker.loginFailed(identifier);
+    }
+  };
+
+  return (
+    <div className="auth-wrap">
+      <button onClick={() => { toggleDark(); window.ActivityTracker.themeToggled(darkMode ? 'light' : 'dark'); }}
+        style={{position:'absolute',top:16,right:18,background:'rgba(255,255,255,.12)',border:'none',cursor:'pointer',padding:'7px 9px',borderRadius:8,color:darkMode?'#fbbf24':'#4d6fff',fontSize:18}}>
+        {darkMode ? '☀' : '🌙'}
+      </button>
+      <div className="auth-card">
+        <div className="auth-logo">
+           <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbPTtZwom3B0ZLIJZNusjlFz3ougRMWPHITQ&s" alt="Gigahertz" style={{maxHeight:'50px', objectFit:'contain', mixBlendMode: darkMode?'screen':'multiply', filter: darkMode?'invert(1) grayscale(1) contrast(2)':'none'}}/>
+        </div>
+        <h1 className="auth-title">Welcome Back</h1>
+        <p className="auth-sub">Sign in to your account</p>
+        <ErrBox msg={err}/>
+        <div className="form-group">
+          <label className="form-label">Employee ID</label>
+          <input className="form-input" type="text" placeholder="e.g. GHZ-001" value={empIdInput}
+            onChange={e=>setEmpIdInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()}/>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Password</label>
+          <div className="pw-wrapper">
+            <input className="form-input" type={showPw?"text":"password"} placeholder="Password"
+              value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()} style={{paddingRight:40}}/>
+            <button type="button" className="pw-toggle-btn" onClick={()=>setShowPw(!showPw)}>
+              {showPw ? <EyeIcon/> : <EyeOffIcon/>}
+            </button>
+          </div>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16,marginTop:-4}}>
+          <label style={{display:'flex',alignItems:'center',gap:6,fontSize:13,color:'var(--tx2)',cursor:'pointer',fontWeight:500}}>
+            <input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)} style={{cursor:'pointer',accentColor:'var(--p)'}}/>
+            Remember Me
+          </label>
+          <a onClick={onForgot} style={{fontSize:13,color:'var(--p)',fontWeight:700,cursor:'pointer'}}>Forgot Password?</a>
+        </div>
+        <button className="btn btn-p" onClick={submit} disabled={loading}>{loading?<span className="spinner"/>:'Sign In'}</button>
+      </div>
+    </div>
+  );
+};
+
+const ForgotPwPage = ({ onBack, darkMode, toggleDark }) => {
+  const [empId, setEmpId] = useState('');
+  const [sent, setSent]   = useState(false);
+
+  const handleReset = (e) => {
+    e.preventDefault();
+    if (empId) {
+      setSent(true);
+      window.ActivityTracker.custom('PASSWORD_RESET_REQUEST', 'Reset requested for: ' + empId);
+    }
+  };
+
+  useEffect(() => { window.ActivityTracker.setPage('forgot-pw'); }, []);
+
+  return (
+    <div className="auth-wrap">
+      <button onClick={()=>{toggleDark();window.ActivityTracker.themeToggled(darkMode?'light':'dark');}}
+        style={{position:'absolute',top:16,right:18,background:'rgba(255,255,255,.12)',border:'none',cursor:'pointer',padding:'7px 9px',borderRadius:8,color:darkMode?'#fbbf24':'#4d6fff',fontSize:18}}>
+        {darkMode?'☀':'🌙'}
+      </button>
+      <div className="auth-card">
+        <div className="auth-logo">
+           <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbPTtZwom3B0ZLIJZNusjlFz3ougRMWPHITQ&s" alt="Gigahertz" style={{maxHeight:'50px', objectFit:'contain', mixBlendMode: darkMode?'screen':'multiply', filter: darkMode?'invert(1) grayscale(1) contrast(2)':'none'}}/>
+        </div>
+        <h1 className="auth-title">Reset Password</h1>
+        {!sent ? (
+          <>
+            <p className="auth-sub">Enter your Employee ID to request a reset link from HR</p>
+            <div className="form-group">
+              <label className="form-label">Employee ID</label>
+              <input className="form-input" type="text" placeholder="GHZ-XXX" value={empId} onChange={e=>setEmpId(e.target.value)}/>
+            </div>
+            <button className="btn btn-p" onClick={handleReset}>Request Reset Link</button>
+          </>
+        ) : (
+          <div style={{textAlign:'center'}}>
+            <div style={{fontSize:40,marginBottom:10}}>📧</div>
+            <p className="auth-sub" style={{color:'var(--ok)',fontWeight:'bold'}}>Request sent for {empId}!</p>
+            <p className="auth-sub">Please check with your department manager or HR for your new credentials.</p>
+          </div>
+        )}
+        <p className="auth-link"><a onClick={onBack}>← Back to Login</a></p>
+      </div>
+    </div>
+  );
+};
+
+const Sidebar = ({page, setPage, user, onLogout, darkMode, toggleDark, notifHistory, isOpen, setIsOpen, themeAccent, setThemeAccent}) => {
+  const nav = [
+    {id:'dashboard', label:'Dashboard',       icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>},
+    {id:'tasks',     label:'Task Management', icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>},
+    {id:'analytics', label:'Analytics',       icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>},
+    {id:'profile',   label:'My Profile',      icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>},
+  ];
+
+  const handleNav = (id) => {
+    setPage(id);
+    window.ActivityTracker.setPage(id);
+    setIsOpen(false);
+  };
+
+  const accents = {
+    blue: { p: '#1a3af5', pd: '#1228d4', pl: 'rgba(26,58,245,0.1)' },
+    purple: { p: '#9333ea', pd: '#7e22ce', pl: 'rgba(147,51,234,0.1)' },
+    emerald: { p: '#10b981', pd: '#059669', pl: 'rgba(16,185,129,0.1)' },
+    rose: { p: '#e11d48', pd: '#be123c', pl: 'rgba(225,29,72,0.1)' },
+    orange: { p: '#f97316', pd: '#ea580c', pl: 'rgba(249,115,22,0.1)' },
+    dark: { p: '#111827', pd: '#030712', pl: 'rgba(17,24,39,0.1)' }
+  };
+
+  return (
+    <>
+      <div className={`sidebar-overlay ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(false)}></div>
+      <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+        <div className="sb-logo">
+           <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbPTtZwom3B0ZLIJZNusjlFz3ougRMWPHITQ&s" alt="Gigahertz" />
+        </div>
+        <nav className="sb-nav">
+          {nav.map(n => (
+            <div key={n.id} className={`nav-item${page===n.id?' active':''}`} onClick={()=>handleNav(n.id)} title={n.label}>
+              {n.icon}
+              <span style={{flex:1}}>{n.label}</span>
+            </div>
+          ))}
+        </nav>
+        <div className="sb-bottom">
+          <div style={{textAlign:'center',fontSize:'9px',fontWeight:800,color:'var(--tx3)',textTransform:'uppercase',letterSpacing:'0.05em',marginBottom:'-12px'}}>Theme Color</div>
+          <div className="theme-picker">
+            {Object.keys(accents).map(k => (
+               <div key={k} className={`theme-circle ${themeAccent===k?'active':''}`}
+                    style={{background: accents[k].p}}
+                    onClick={()=>setThemeAccent(k)} />
+            ))}
+          </div>
+
+          <div className="sb-user">
+            <div className="user-avatar">{user?.firstName?user.firstName[0].toUpperCase():'U'}</div>
+            <div className="user-info">
+              <span className="user-name">{user?.firstName} {user?.lastName}</span>
+              <div className="user-details">
+                {user?.empId && <span className="user-detail-tag">{user.empId}</span>}
+                {user?.dept  && <span className="user-detail-tag">{user.dept}</span>}
+              </div>
+            </div>
+          </div>
+          
+          <div style={{display:'flex', flexDirection:'column', gap:'4px', position:'relative'}}>
+             <button className="action-btn action-btn-wrap" tabIndex="0">
+               <div className="action-btn-left">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                  Notifications
+               </div>
+               {notifHistory.length > 0 && <div className="notif-badge">{notifHistory.length}</div>}
+               <div className="notif-panel">
+                  <div style={{fontWeight:800,fontSize:11,marginBottom:8,color:'var(--tx)',borderBottom:'1px solid var(--bd)',paddingBottom:8,textTransform:'uppercase',letterSpacing:'0.05em'}}>Recent Activity</div>
+                  {notifHistory.length === 0
+                    ? <div style={{fontSize:11,color:'var(--tx3)',padding:'8px'}}>No new notifications.</div>
+                    : notifHistory.map(n => (
+                        <div key={n.id} className="notif-item">
+                          <div style={{fontWeight:600}}>{n.msg}</div>
+                          <div className="notif-time">{n.time.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</div>
+                        </div>
+                      ))
+                  }
+                </div>
+             </button>
+
+             <button className="action-btn" onClick={()=>{toggleDark();window.ActivityTracker.themeToggled(darkMode?'light':'dark');}}>
+               <div className="action-btn-left">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                    {darkMode
+                      ? <><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></>
+                      : <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    }
+                  </svg>
+                  Dark Mode
+               </div>
+             </button>
+          </div>
+          
+          <button className="logout-btn" onClick={onLogout} title="Sign out">
+            <img src="https://contents.smsupermalls.com/data/uploads/2020/07/GIGAHERTZ_COMPUTER_SYSTEM.jpg" alt="Log out icon" style={{borderRadius: '4px'}} />
+            Log Out
+          </button>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const DashboardPage = ({user, tasks, onTasksChanged, activeTimer, setActiveTimer, elapsed, setElapsed, loginTime, pushNotif, toggleMenu}) => {
+  const [selTask, setSelTask]           = useState('');
+  const [otherTask, setOtherTask]       = useState('');
+  const [customTask, setCustomTask]     = useState('');
+  const [taskSearch, setTaskSearch]     = useState('');
+  const [pendingQueue, setPendingQueue] = useState(() => {
+    const pending = window.appParse(window.safeStorage.getItem('gh_pending'), []);
+    return Array.isArray(pending) ? pending.filter(p => p.userId === user?.id) : [];
+  });
+
+  const secs        = useLiveClock(loginTime);
+  const currentTime = useRealTimeClock();
+
+  const QUOTES = [
+    "Focus on being productive instead of busy.",
+    "The key is in not spending time, but in investing it.",
+    "Action is the foundational key to all success.",
+    "Amateurs sit and wait for inspiration, the rest of us just get up and go to work.",
+    "Until we can manage time, we can manage nothing else."
+  ];
+  const [quote] = useState(() => QUOTES[Math.floor(Math.random() * QUOTES.length)]);
+
+  const todayTasks    = tasks.filter(t => cStr(t.date) === todayStr());
+  const filteredTasks = todayTasks.filter(t => (t.taskName || '').toLowerCase().includes(taskSearch.toLowerCase()));
+  const totalMins     = todayTasks.reduce((s,t) => s + Number(t.durationMinutes||0), 0);
+
+  const d = new Date(); d.setDate(d.getDate() - 7);
+  const weekStart = d.toISOString().split('T')[0];
+  const weekMins  = tasks.filter(t => cStr(t.date) >= weekStart).reduce((s,t) => s + Number(t.durationMinutes||0), 0);
+  const prodScore = Math.min(100, Math.round((weekMins / 2400) * 100));
+
+  useEffect(() => {
+    if (activeTimer) window.safeStorage.setItem('gh_active_timer', JSON.stringify(activeTimer));
+    else             window.safeStorage.removeItem('gh_active_timer');
+  }, [activeTimer]);
+
+  useEffect(() => {
+    const saved = window.appParse(window.safeStorage.getItem('gh_active_timer'), null);
+    if (saved && !activeTimer) setActiveTimer(saved);
+  }, []);
+
+  const saveQueue = (updated) => {
+    setPendingQueue(updated);
+    const allPending = window.appParse(window.safeStorage.getItem('gh_pending'), []).filter(p => p.userId !== user.id);
+    window.safeStorage.setItem('gh_pending', JSON.stringify([...allPending, ...updated]));
+  }
+
+  const addToQueue = () => {
+    const name = customTask.trim();
+    if (!name) return;
+    const newTask = { id:'id_'+Math.random().toString(36).slice(2), userId:user.id, taskName:name, addedAt:new Date().toISOString() };
+    saveQueue([...pendingQueue, newTask]);
+    setCustomTask('');
+    pushNotif(`✓ Added to queue: "${name}"`, 'success');
+    window.ActivityTracker.taskQueued(name);
+  };
+
+  const startFromQueue = (qTask) => {
+    saveQueue(pendingQueue.filter(t => t.id !== qTask.id));
+    startTimer(qTask.taskName);
+  };
+
+  const removeFromQueue = (id) => {
+    const task = pendingQueue.find(t => t.id === id);
+    saveQueue(pendingQueue.filter(t => t.id !== id));
+    pushNotif("✕ Task removed from queue", "error");
+    if (task) window.ActivityTracker.taskDequeued(task.taskName);
+  };
+
+  const clearQueue = () => {
+    window.ActivityTracker.custom('QUEUE_CLEARED', `Cleared ${pendingQueue.length} queued tasks`);
+    saveQueue([]);
+    pushNotif("Queue cleared", "success");
+  };
+
+  const startTimer = async (name) => {
+    if (!name.trim()) return;
+    const ss  = nowHHMM();
+    const res = await api.timerStart({userId:user.id, empId:user.empId, taskName:name});
+    setActiveTimer({taskName:name, startStr:ss, timerId:res?.timerId||null, isPaused:false, elapsedBeforePause:0});
+    setElapsed(0);
+    pushNotif(`▶ Timer started for "${name}"`, 'success');
+    window.ActivityTracker.timerStart(name);
+  };
+
+  const togglePause = () => {
+    if (!activeTimer) return;
+    const isNowPaused = !activeTimer.isPaused;
+    setActiveTimer(p => ({...p, isPaused:isNowPaused}));
+    if (isNowPaused) window.ActivityTracker.timerPause(activeTimer.taskName);
+    else             window.ActivityTracker.timerResume(activeTimer.taskName);
+  };
+
+  const stopTimer = async () => {
+    if (!activeTimer) return;
+    const endStr   = nowHHMM();
+    const totalSec = elapsed;
+    const mins     = totalSec < 60 ? 1 : Math.round(totalSec / 60);
+
+    const newTask = {
+      id: 'temp_' + Date.now(),
+      userId: user.id,
+      empId: user.empId,
+      taskName: activeTimer.taskName,
+      date: todayStr(),
+      startTime: activeTimer.startStr,
+      endTime: endStr,
+      durationMinutes: mins,
+      source: 'timer',
+      remarks: ''
+    };
+
+    onTasksChanged(newTask);
+    
+    const h=Math.floor(totalSec/3600), m=Math.floor((totalSec%3600)/60), s=totalSec%60;
+    const sum = h>0?`${h}h ${m}m ${s}s`:m>0?`${m}m ${s}s`:`${s}s`;
+    
+    setActiveTimer(null); 
+    setElapsed(0);
+    pushNotif(`✓ "${activeTimer.taskName}" saved successfully!`, 'success');
+
+    api.timerStop({timerId:activeTimer.timerId, userId:user.id, empId:user.empId, taskName:activeTimer.taskName, durationSeconds:totalSec, savedAsTask:true});
+    api.addTask(newTask);
+    
+    window.ActivityTracker.timerStop(activeTimer.taskName, totalSec);
+    window.ActivityTracker.taskSaved(activeTimer.taskName, mins);
+  };
+
+  const H=Math.floor(elapsed/3600), M=Math.floor((elapsed%3600)/60), S=elapsed%60;
+
+  return (
+    <div className="page">
+      <div className="page-hdr">
+        <div style={{display:'flex', alignItems:'center', gap:10}}>
+          <button className="mobile-toggle" onClick={toggleMenu}>☰</button>
+          <div>
+            <h1 className="page-title">Dashboard</h1>
+            <p className="page-sub">Welcome back, {user?.firstName} ({user?.empId || 'GHZ-000'})</p>
+          </div>
+        </div>
+        <div style={{display:'flex',gap:12,alignItems:'center'}}>
+          <div style={{fontSize:16,fontWeight:800,color:'var(--tx)'}}>{currentTime}</div>
+          <div className="page-date">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            {fmtDate12(todayStr())}
+          </div>
+        </div>
+      </div>
+
+      <div style={{padding:'12px 18px',background:'linear-gradient(135deg, var(--pl) 0%, rgba(26,58,245,.04) 100%)',color:'var(--p)',borderRadius:'var(--rsm)',fontSize:13,fontWeight:600,marginBottom:26,border:'1px solid rgba(26,58,245,.2)',display:'flex',alignItems:'center',gap:10}}>
+        <span style={{fontSize:18}}>💡</span>
+        <span>"{quote}"</span>
+      </div>
+
+      <div style={{marginBottom:28}}>
+        <div className="stat-grid">
+          <div className="stat-card" style={{position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:0,right:0,width:'60%',height:'100%',background:'linear-gradient(135deg,rgba(26,58,245,.08) 0%,transparent 100%)',pointerEvents:'none'}}></div>
+            <div className="stat-icon" style={{background:'var(--pl)'}}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--p)" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div className="stat-lbl">Session Time</div>
+            <div className="stat-clock">{fmtHHMMSS(secs)}</div>
+            <div className="stat-live"><div className="live-dot"/><span style={{fontSize:11,color:'var(--tx2)',fontWeight:600}}>{loginTime?`Since ${new Date(loginTime).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`:''}</span></div>
+          </div>
+          <div className="stat-card" style={{position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:0,right:0,width:'60%',height:'100%',background:'linear-gradient(135deg,rgba(16,185,129,.08) 0%,transparent 100%)',pointerEvents:'none'}}></div>
+            <div className="stat-icon" style={{background:'#ecfdf5'}}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" strokeWidth="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 012-2h11"/></svg></div>
+            <div className="stat-lbl">Tasks Logged</div>
+            <div className="stat-val" style={{color:'var(--ok)'}}>{todayTasks.length}</div>
+            <div className="stat-sub">{todayTasks.length===1?'entry':'entries'} today • {fmtMins(totalMins)} tracked</div>
+          </div>
+          <div className="stat-card" style={{position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:0,right:0,width:'60%',height:'100%',background:'linear-gradient(135deg,rgba(147,51,234,.08) 0%,transparent 100%)',pointerEvents:'none'}}></div>
+            <div className="stat-icon" style={{background:'#faf5ff'}}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9333ea" strokeWidth="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <div className="stat-lbl">Productivity Pulse</div>
+            <div className="stat-val" style={{color:'#9333ea'}}>{prodScore}%</div>
+            <div className="stat-sub">Weekly goal: {fmtMins(weekMins)} / 40h</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="dashboard-grid" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24,marginBottom:28,alignItems:'start'}}>
+        <div style={{minHeight:'280px',position:'relative'}}>
+          {activeTimer ? (
+            <div className="timer-active">
+              {activeTimer.isPaused && (
+                <div style={{position:'absolute',top:14,right:14,background:'#d97706',color:'#fff',padding:'8px 14px',borderRadius:'99px',fontSize:11,fontWeight:800,animation:'pulse 1.2s ease-in-out infinite',zIndex:10,display:'flex',alignItems:'center',gap:6,boxShadow:'0 4px 12px rgba(217,119,6,.3)'}}>
+                  ⏸ PAUSED
+                </div>
+              )}
+              <div className="timer-lbl">{activeTimer.isPaused?'⏸ Paused':'🔴 LIVE TIMER'}</div>
+              <div className="timer-task" title={activeTimer.taskName}>{activeTimer.taskName}</div>
+              <div className="timer-digits-row">
+                {H>0&&<><div><div className={`timer-digits ${activeTimer.isPaused?'paused':''}`}>{String(H).padStart(2,'0')}</div><div className="timer-unit">HRS</div></div><div className="timer-sep">:</div></>}
+                <div><div className={`timer-digits ${activeTimer.isPaused?'paused':''}`}>{String(M).padStart(2,'0')}</div><div className="timer-unit">MIN</div></div>
+                <div className="timer-sep">:</div>
+                <div><div className={`timer-digits ${activeTimer.isPaused?'paused':''}`} style={{color:(!activeTimer.isPaused&&S%2===0)?'#fff':'rgba(255,255,255,.6)',transition:'color .5s'}}>{String(S).padStart(2,'0')}</div><div className="timer-unit">SEC</div></div>
+              </div>
+              <div className="timer-meta">
+                <div className={`timer-dot ${activeTimer.isPaused?'paused':'active'}`}/>
+                <span className="timer-meta-txt">{activeTimer.isPaused?'⏸ Paused':`✓ Started ${cStr(activeTimer.startStr)}`}</span>
+              </div>
+              <div className="timer-bar-wrap">
+                <div className={`timer-bar ${activeTimer.isPaused?'paused':''}`} style={{width:`${Math.min(100,(elapsed/3600)%1*100)}%`,transition:'width 0.1s linear'}}/>
+              </div>
+              <div className="timer-actions">
+                <button className="pause-btn" onClick={togglePause} style={{flex:1}}>
+                  {activeTimer.isPaused?'▶ Resume':'⏸ Pause'}
+                </button>
+                <button className="stop-btn" onClick={stopTimer} style={{flex:2}}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+                  Stop & Save Task
+                </button>
+              </div>
+              <div className="timer-hint">💾 Only rounded minutes are saved</div>
+            </div>
+          ) : (
+            <div className="track-section" style={{marginBottom:0,position:'relative',overflow:'hidden'}}>
+              <div style={{position:'absolute',top:0,right:0,width:'50%',height:'100%',background:'linear-gradient(135deg,rgba(26,58,245,.06) 0%,transparent 100%)',pointerEvents:'none'}}></div>
+              <div className="track-title" style={{position:'relative'}}>⏱ Start Tracking</div>
+              <div className="track-sub" style={{position:'relative',marginBottom:18}}>Select a task or create a new one</div>
+              <div className="track-row">
+                <select className="track-select" value={selTask} onChange={e=>setSelTask(e.target.value)}>
+                  <option value="">— Select preset task —</option>
+                  {PRESET.map(t=><option key={t} value={t}>{t}</option>)}
+                </select>
+                {selTask === 'Other' && (
+                  <input className="custom-input" style={{flex:1, minWidth: '150px'}} placeholder="Specify other task..." value={otherTask} onChange={e=>setOtherTask(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&otherTask){startTimer(otherTask);}}} />
+                )}
+                <button className="start-btn" onClick={()=>{
+                    const taskToStart = selTask === 'Other' ? otherTask : selTask;
+                    if(taskToStart) startTimer(taskToStart);
+                }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Start
+                </button>
+              </div>
+              <div style={{marginTop:20,marginBottom:10,fontSize:11,fontWeight:700,color:'var(--tx3)',textTransform:'uppercase',letterSpacing:'0.05em'}}>Or create custom task</div>
+              <div className="custom-row" style={{marginTop:0}}>
+                <input className="custom-input" placeholder="Enter task name..." value={customTask}
+                  onChange={e=>setCustomTask(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addToQueue()}/>
+                <button className="add-btn" onClick={addToQueue}>+ Queue</button>
+              </div>
+              <div style={{marginTop:8,fontSize:10,color:'var(--tx3)',fontWeight:500}}>💡 Add tasks to queue and start them anytime</div>
+            </div>
+          )}
+        </div>
+
+        <div className="queue-section stat-card" style={{height:'100%',marginBottom:0}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
+            <div>
+              <div className="track-title">📋 Task Queue</div>
+              <div className="track-sub" style={{marginBottom:0}}>Pending tasks ({pendingQueue.length})</div>
+            </div>
+            {pendingQueue.length > 0 && <button className="queue-clear-btn" onClick={clearQueue}>✕ Clear</button>}
+          </div>
+          {pendingQueue.length === 0 ? (
+            <div className="empty-state" style={{padding:'30px 12px',textAlign:'center'}}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{opacity:.25,marginBottom:12}}><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 012-2h11"/></svg>
+              <p style={{fontSize:13,fontWeight:600,color:'var(--tx)',marginBottom:2}}>No tasks queued</p>
+              <p style={{fontSize:11,color:'var(--tx3)'}}>Add a task to get started 🚀</p>
+            </div>
+          ) : (
+            <div className="recent-list" style={{maxHeight:210,marginBottom:-12}}>
+              {pendingQueue.map((q,idx) => (
+                <div key={q.id} className="queue-item" style={{marginBottom:idx===pendingQueue.length-1?0:8}}>
+                  <div style={{display:'flex',alignItems:'center',gap:10,flex:1}}>
+                    <div style={{width:24,height:24,background:'var(--p)',color:'#fff',borderRadius:50,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:800,flexShrink:0}}>{idx+1}</div>
+                    <div style={{flex:1}}>
+                      <div className="queue-task-name" style={{marginBottom:2}}>{q.taskName}</div>
+                      <span style={{fontSize:10,color:'var(--tx3)',fontWeight:600}}>Added {new Date(q.addedAt).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</span>
+                    </div>
+                  </div>
+                  <div style={{display:'flex',gap:6}}>
+                    <button className="queue-start-btn" onClick={()=>startFromQueue(q)} disabled={activeTimer!==null}>▶</button>
+                    <button className="queue-del-btn" onClick={()=>removeFromQueue(q.id)}>✕</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="recent-section" style={{marginBottom:0}}>
+        <div className="sec-hdr">
+          <span className="sec-title">📝 Today's Tasks ({todayTasks.length})</span>
+          <div style={{display:'flex',alignItems:'center',gap:12, flexWrap:'wrap', flex: 1, justifyContent:'flex-end'}}>
+            <input type="text" className="search-recent" placeholder="🔍 Search tasks..." value={taskSearch} onChange={e=>setTaskSearch(e.target.value)}/>
+            <span style={{fontSize:12,color:'var(--tx2)',fontWeight:600,whiteSpace:'nowrap'}}>{filteredTasks.length} showing</span>
+          </div>
+        </div>
+        <div className="recent-list" style={{maxHeight:320}}>
+          {filteredTasks.length === 0
+            ? <div className="empty-state" style={{padding:'40px 20px'}}>
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{opacity:.25,marginBottom:12}}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <p style={{fontSize:13,fontWeight:600,marginBottom:4,color:'var(--tx)'}}>{taskSearch?'🔍 No matching tasks':'✓ No tracked tasks yet'}</p>
+                <p style={{fontSize:11,color:'var(--tx3)'}}>{taskSearch?'Try a different search term':'Start a timer above to track time'}</p>
+              </div>
+            : filteredTasks.map((t,idx) => (
+                <div key={t.id} className="task-row" style={{animation:`slideIn 0.3s ease ${idx*20}ms`,animationFillMode:'both'}}>
+                  <div className="task-info">
+                    <div className="task-cat-dot" style={{background:getCategoryColor(t.taskName)}}></div>
+                    <div>
+                      <div className="task-name">{t.taskName}</div>
+                      <div className="task-time">
+                        <span style={{fontWeight:700}}>{fmt12(cStr(t.startTime))}</span>
+                        <span style={{margin:'0 6px'}}>→</span>
+                        <span>{fmt12(cStr(t.endTime))}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span className="dur-badge">{fmtMins(Number(t.durationMinutes)||0)}</span>
+                </div>
+              ))
+          }
+        </div>
+      </div>
+      <style>{`@keyframes slideIn { from{opacity:0;transform:translateY(-8px);} to{opacity:1;transform:translateY(0);} }`}</style>
+    </div>
+  );
+};
+
+const TasksPage = ({user, tasks, onTasksChanged, pushNotif, toggleMenu}) => {
+  const [fd, setFd] = useState('');
+  
+  const filtered = tasks.filter(t => !fd || cStr(t.date) === fd);
+  const totalMins = filtered.reduce((s,t) => s + Number(t.durationMinutes||0), 0);
+
+  const handleRemarkChange = async (id, val) => {
+    const res = await api.updateTaskRemark({ taskId:id, remarks:val });
+    if (res.success) {
+      onTasksChanged();
+      window.ActivityTracker.remarkUpdated(id);
+    }
+  };
+
+  return (
+    <div className="page">
+      <div className="page-hdr">
+        <div style={{display:'flex', alignItems:'center', gap:10}}>
+          <button className="mobile-toggle" onClick={toggleMenu}>☰</button>
+          <div>
+            <h1 className="page-title">Task Management</h1>
+            <p className="page-sub">View your complete time entry history</p>
+          </div>
+        </div>
+      </div>
+      <div className="tm-hdr">
+        <div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
+          <span className="total-badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Total: {fmtMins(totalMins)}
+          </span>
+          <div className="date-filter">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--tx3)" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <input type="date" value={fd} onChange={e=>setFd(e.target.value)}/>
+            {fd && <button onClick={()=>setFd('')} style={{background:'none',border:'none',cursor:'pointer',color:'var(--tx3)',fontSize:16,fontWeight:800}}>×</button>}
+          </div>
+          {fd && <span style={{fontSize:12.5,color:'var(--tx2)',fontWeight:600}}>{filtered.length} tasks shown</span>}
+        </div>
+      </div>
+      <div className="table-wrap">
+        {filtered.length === 0
+          ? <div className="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>No tasks found for this selection.</p></div>
+          : <table className="gh-table">
+              <thead>
+                <tr>
+                  <th>Employee ID</th>
+                  <th>Task Name</th>
+                  <th>Date</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Duration</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map(t => (
+                  <tr key={t.id}>
+                    <td>{t.empId}</td>
+                    <td style={{fontWeight:700}}>
+                      <div style={{display:'flex',alignItems:'center'}}>
+                        <div className="task-cat-dot" style={{background:getCategoryColor(t.taskName)}}></div>
+                        {t.taskName}
+                      </div>
+                    </td>
+                    <td>{fmtDate12(cStr(t.date))}</td>
+                    <td>{fmt12(cStr(t.startTime))}</td>
+                    <td>{fmt12(cStr(t.endTime))}</td>
+                    <td><span className="dur-badge">{fmtMins(Number(t.durationMinutes)||0)}</span></td>
+                    <td style={{width:'25%'}}>
+                      <input type="text" defaultValue={cStr(t.remarks)||''} placeholder="Add remark..."
+                        onBlur={e=>{ if(e.target.value!==(cStr(t.remarks)||'')) handleRemarkChange(t.id,e.target.value); }}
+                        style={{background:'transparent',border:'none',outline:'none',color:'var(--tx)',fontSize:'13px',width:'100%',borderBottom:'1px dashed transparent',padding:'4px 0',transition:'border-color .2s'}}
+                        onFocus={e=>e.target.style.borderBottom='1px dashed var(--p)'}
+                        onBlurCapture={e=>e.target.style.borderBottom='1px dashed transparent'}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+        }
+      </div>
+    </div>
+  );
+};
+
+const AnalyticsPage = ({user, tasks, toggleMenu}) => {
+  const barRef=useRef(null), doughnutRef=useRef(null);
+  const barC=useRef(null),   doughnutC=useRef(null);
+
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date(); d.setDate(d.getDate()-6);
+    return d.toISOString().split('T')[0];
+  });
+  const [endDate, setEndDate] = useState(() => todayStr());
+
+  const filteredTasks = tasks.filter(t => cStr(t.date) >= startDate && cStr(t.date) <= endDate);
+
+  const getFocusData = () => {
+    let focus=0, admin=0, breakTime=0;
+    filteredTasks.forEach(t => {
+      const m = Number(t.durationMinutes||0);
+      if (/code|dev|design|plan|research|test|build/i.test(t.taskName))  focus += m;
+      else if (/break|lunch|idle|away|social/i.test(t.taskName)) breakTime += m;
+      else admin += m;
+    });
+    return { focus, admin, breakTime };
+  };
+  const { focus, admin, breakTime } = getFocusData();
+
+  useEffect(() => {
+    const days = [];
+    let curr = new Date(startDate);
+    const endDt = new Date(endDate);
+    
+    if (endDt >= curr) {
+      while(curr <= endDt && days.length < 366) {
+        const ds = curr.toISOString().split('T')[0];
+        const label = curr.toLocaleDateString('en-US',{month:'short', day:'numeric'});
+        const mins = filteredTasks.filter(t=>cStr(t.date)===ds).reduce((s,t)=>s+Number(t.durationMinutes||0),0);
+        days.push({ label, mins });
+        curr.setDate(curr.getDate() + 1);
+      }
+    }
+
+    const gridColor='rgba(136,144,170,.15)', tickColor='var(--tx2)';
+
+    if (barRef.current) {
+      if (barC.current) barC.current.destroy();
+      barC.current = new Chart(barRef.current, {
+        type:'line',
+        data:{ labels:days.map(d=>d.label), datasets:[{data:days.map(d=>d.mins/60),fill:true,backgroundColor:'rgba(26,58,245,.1)',borderColor:'var(--p)',borderWidth:3,tension:.4,pointRadius:days.length>30?0:4}] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{grid:{color:gridColor},ticks:{callback:v=>`${v}h`,color:tickColor}},x:{grid:{display:false},ticks:{color:tickColor, maxTicksLimit: 15}}} }
+      });
+    }
+    if (doughnutRef.current) {
+      if (doughnutC.current) doughnutC.current.destroy();
+      doughnutC.current = new Chart(doughnutRef.current, {
+        type:'doughnut',
+        data:{ labels:['Deep Work','Admin/Meetings','Breaks'], datasets:[{data:[focus,admin,breakTime],backgroundColor:['var(--p)','#9333ea','#fbbf24'],borderWidth:2,borderColor:'var(--card)'}] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{color:tickColor,font:{family:'Plus Jakarta Sans',size:11,weight:'600'}}}}, cutout:'75%' }
+      });
+    }
+    return () => { barC.current?.destroy(); doughnutC.current?.destroy(); };
+  }, [filteredTasks, focus, admin, breakTime, startDate, endDate]);
+
+  const handleExport = () => {
+    exportCSV(['Employee ID','Task Name','Date','Start Time','End Time','Duration','Remarks'], filteredTasks.map(t=>[t.empId,t.taskName,cStr(t.date),cStr(t.startTime),cStr(t.endTime),t.durationMinutes,cStr(t.remarks)]), 'productivity_export.csv');
+    window.ActivityTracker.csvExported(filteredTasks.length);
+  };
+
+  return (
+    <div className="page">
+      <div className="page-hdr" style={{flexWrap: 'wrap', gap: '20px'}}>
+        <div style={{display:'flex', alignItems:'center', gap:10}}>
+          <button className="mobile-toggle" onClick={toggleMenu}>☰</button>
+          <div>
+            <h1 className="page-title">Comprehensive Productivity Dashboard</h1>
+            <p className="page-sub">AI-driven actionable insights and engagement analysis</p>
+          </div>
+        </div>
+        <div style={{display:'flex',gap:10, alignItems:'center', flexWrap:'wrap'}}>
+          <div className="date-filter">
+             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--tx3)" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+             <input type="date" value={startDate} onChange={e=>setStartDate(e.target.value)} />
+             <span style={{color:'var(--tx3)', fontSize: 13, fontWeight:600}}>to</span>
+             <input type="date" value={endDate} onChange={e=>setEndDate(e.target.value)} />
+          </div>
+          <button className="btn btn-ghost" onClick={handleExport}>📥 Export CSV</button>
+        </div>
+      </div>
+
+      <div className="analytics-stats" style={{marginBottom:24}}>
+        <div className="chart-card">
+          <div className="chart-title">Task Category Distribution</div>
+          <div className="chart-sub">Breakdown of time spent by task type</div>
+          <div style={{height:180}}><canvas ref={doughnutRef}/></div>
+        </div>
+        <div className="chart-card">
+          <div className="chart-title">Trend Analysis</div>
+          <div className="chart-sub">Hours worked per day ({new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()})</div>
+          <div style={{height:180}}><canvas ref={barRef}/></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ProfilePage = ({ user, tasks, onUpdateUser, pushNotif, toggleMenu }) => {
+  const fileInputRef = useRef(null);
+  const [loading, setLoading]     = useState(false);
+
+  // Password Change State
+  const [showPwModal, setShowPwModal] = useState(false);
+  const [pwData, setPwData] = useState({ current: '', newPw: '', confirm: '' });
+  const [pwLoading, setPwLoading] = useState(false);
+
+  const allMins    = tasks.reduce((s,t) => s + Number(t.durationMinutes||0), 0);
+  const totalHours = (allMins / 60).toFixed(1);
+  const uDays      = [...new Set(tasks.map(t => cStr(t.date)))].length;
+
+  // CHECK PHOTO LOCK
+  let canChangePhoto = true;
+  let daysLeftToChange = 0;
+  if (user?.lastPhotoUpdate) {
+    const daysSince = (Date.now() - new Date(user.lastPhotoUpdate).getTime()) / (1000 * 60 * 60 * 24);
+    if (daysSince < 30) {
+      canChangePhoto = false;
+      daysLeftToChange = Math.ceil(30 - daysSince);
+    }
+  }
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setLoading(true);
+    const reader = new FileReader();
+    
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = async () => {
+        // Resize and compress the image using Canvas
+        const canvas = document.createElement('canvas');
+        const MAX_SIZE = 150; 
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_SIZE) {
+            height *= MAX_SIZE / width;
+            width = MAX_SIZE;
+          }
+        } else {
+          if (height > MAX_SIZE) {
+            width *= MAX_SIZE / height;
+            height = MAX_SIZE;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Compress to JPEG at 60% quality 
+        const b64 = canvas.toDataURL('image/jpeg', 0.6);
+        
+        if (b64.length > 45000) {
+            pushNotif('Image is too complex. Try a simpler or smaller picture.', 'error');
+            setLoading(false);
+            return;
+        }
+
+        const res = await api.updatePhoto({ userId:user.id, photoBase64:b64 });
+        setLoading(false);
+        
+        if (res.success) {
+          onUpdateUser({ ...user, photoBase64:b64, lastPhotoUpdate: res.lastPhotoUpdate });
+          pushNotif('Profile photo updated!', 'success');
+          window.ActivityTracker.photoUpdated();
+        } else {
+          pushNotif(res.error || 'Failed to update photo', 'error');
+        }
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handlePwSubmit = async () => {
+    if (!pwData.current || !pwData.newPw || !pwData.confirm) return pushNotif('All fields are required.', 'error');
+    if (pwData.newPw !== pwData.confirm) return pushNotif('New passwords do not match.', 'error');
+    if (pwData.newPw.length < 8) return pushNotif('Password must be at least 8 characters.', 'error');
+    
+    setPwLoading(true);
+    const res = await api.changePassword({ userId: user.id, currentPassword: pwData.current, newPassword: pwData.newPw });
+    setPwLoading(false);
+    
+    if (res.success) {
+      pushNotif('Password changed successfully!', 'success');
+      setShowPwModal(false);
+      setPwData({ current: '', newPw: '', confirm: '' });
+      window.ActivityTracker.passwordChanged();
+    } else {
+      pushNotif(res.error || 'Failed to change password.', 'error');
+    }
+  };
+
+  const defaultAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238890aa'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E";
+
+  return (
+    <div className="page">
+      {/* Password Modal */}
+      {showPwModal && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <h2 style={{fontSize: 18, fontWeight: 800, marginBottom: 20}}>Change Password</h2>
+            <div className="form-group">
+              <label className="form-label">Current Password</label>
+              <input type="password" className="form-input" value={pwData.current} onChange={e=>setPwData({...pwData, current: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">New Password</label>
+              <input type="password" className="form-input" value={pwData.newPw} onChange={e=>setPwData({...pwData, newPw: e.target.value})} />
+            </div>
+            <div className="form-group" style={{marginBottom: 24}}>
+              <label className="form-label">Confirm New Password</label>
+              <input type="password" className="form-input" value={pwData.confirm} onChange={e=>setPwData({...pwData, confirm: e.target.value})} />
+            </div>
+            <div style={{display:'flex', gap: 10}}>
+              <button className="btn btn-ghost" style={{flex: 1}} onClick={()=>setShowPwModal(false)}>Cancel</button>
+              <button className="btn btn-p" style={{flex: 1}} onClick={handlePwSubmit} disabled={pwLoading}>{pwLoading ? 'Saving...' : 'Update Password'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="page-hdr">
+        <div style={{display:'flex', alignItems:'center', gap:10}}>
+          <button className="mobile-toggle" onClick={toggleMenu}>☰</button>
+          <div><h1 className="page-title">My Profile</h1><p className="page-sub">Manage your account and view your stats</p></div>
+        </div>
+      </div>
+      <div className="profile-grid">
+        <div className="stat-card" style={{textAlign:'center',padding:'40px 24px'}}>
+          <div className="avatar-wrapper">
+            <img src={user?.photoBase64 || window.safeStorage.getItem(`gh_photo_${user?.id}`) || defaultAvatar} className="avatar-img" alt="Profile"/>
+            
+            {loading ? (
+              <div className="avatar-btn" style={{cursor:'wait'}}><span className="spinner" style={{width:16,height:16,borderWidth:2}}/></div>
+            ) : canChangePhoto ? (
+              <button onClick={()=>fileInputRef.current.click()} className="avatar-btn" title="Change Photo">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </button>
+            ) : (
+              <button className="avatar-btn locked" title={`Locked. You can change your photo again in ${daysLeftToChange} days.`} onClick={()=>pushNotif(`Locked. You can change your photo again in ${daysLeftToChange} days.`, 'error')}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              </button>
+            )}
+            <input type="file" accept="image/*" ref={fileInputRef} style={{display:'none'}} onChange={handlePhotoChange} disabled={loading || !canChangePhoto}/>
+          </div>
+          <h2 style={{fontSize:20,fontWeight:800,color:'var(--tx)',marginBottom:6}}>{user?.firstName} {user?.lastName}</h2>
+          <p style={{fontSize:13.5,color:'var(--tx2)',marginBottom:16,fontWeight:500}}>{user?.empId}</p>
+          <div style={{display:'flex',justifyContent:'center',gap:8,flexWrap:'wrap', marginBottom: 20}}>
+            {user?.dept && <span className="dur-badge" style={{padding:'6px 14px',fontSize:12}}>{user.dept}</span>}
+          </div>
+          
+          <button className="btn btn-ghost" style={{width: '100%', fontSize: 13}} onClick={()=>setShowPwModal(true)}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight: 6}}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Change Password
+          </button>
+        </div>
+        <div>
+          <div className="stat-grid" style={{gridTemplateColumns:'1fr 1fr'}}>
+            <div className="stat-card"><div className="stat-lbl">Total Tasks Logged</div><div className="stat-val">{tasks.length}</div></div>
+            <div className="stat-card"><div className="stat-lbl">Total Hours</div><div className="stat-val">{totalHours}<span style={{fontSize:15,color:'var(--tx3)'}}> hrs</span></div></div>
+            <div className="stat-card"><div className="stat-lbl">Active Days</div><div className="stat-val">{uDays}</div></div>
+            <div className="stat-card"><div className="stat-lbl">Avg. Hours / Day</div><div className="stat-val">{uDays?(totalHours/uDays).toFixed(1):0}<span style={{fontSize:15,color:'var(--tx3)'}}> hrs</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const IdleWatcher = ({user, onIdleOut}) => {
+  const [idleSecs, setIdleSecs] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popSecs, setPopSecs]     = useState(0);
+  const lastAct = useRef(Date.now());
+
+  const reset = useCallback(() => { lastAct.current = Date.now(); if (!showPopup) setIdleSecs(0); }, [showPopup]);
+  useEffect(() => {
+    const evts = ['mousemove','mousedown','keydown','touchstart','click','scroll'];
+    evts.forEach(e => window.addEventListener(e, reset, {passive:true}));
+    return () => evts.forEach(e => window.removeEventListener(e, reset));
+  }, [reset]);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      const s = Math.floor((Date.now() - lastAct.current) / 1000);
+      setIdleSecs(s);
+      if (s >= 1800 && !showPopup) { setShowPopup(true); setPopSecs(0); window.ActivityTracker.idleWarning(s); }
+    }, 1000);
+    return () => clearInterval(t);
+  }, [showPopup]);
+
+  useEffect(() => {
+    if (!showPopup) return;
+    const t = setInterval(() => setPopSecs(p => {
+      const n = p + 1;
+      if (n >= 120) { clearInterval(t); setShowPopup(false); onIdleOut && onIdleOut(idleSecs); }
+      return n;
+    }), 1000);
+    return () => clearInterval(t);
+  }, [showPopup]);
+
+  const here = () => { setShowPopup(false); setIdleSecs(0); lastAct.current = Date.now(); window.ActivityTracker.idleDismissed(idleSecs); };
+  const out  = () => { setShowPopup(false); setIdleSecs(0); lastAct.current = Date.now(); window.ActivityTracker.idleOut(idleSecs); onIdleOut && onIdleOut(idleSecs); };
+
+  const grace = 120, pct = Math.min(100, (popSecs / grace) * 100);
+  const mm = String(Math.floor(idleSecs/60)).padStart(2,'0'), ss = String(idleSecs%60).padStart(2,'0');
+
+  if (!showPopup) return null;
+  return (
+    <div className="idle-overlay">
+      <div className="idle-card">
+        <div className="idle-icon">⏰</div>
+        <div className="idle-title">Still there?</div>
+        <div className="idle-msg">No activity for <strong>{Math.round(idleSecs/60)} minutes</strong>.<br/>Your session clock is still running.</div>
+        <div className="idle-time">{mm}:{ss}</div>
+        <div className="idle-btns">
+          <button className="idle-here" onClick={here}>👋 I'm here</button>
+          <button className="idle-out"  onClick={out}>🚶 I stepped away</button>
+        </div>
+        <div className="idle-prog-wrap"><div className="idle-prog-fill" style={{width:`${pct}%`,background:pct>70?'var(--danger)':'var(--warn)'}}/></div>
+        <p style={{fontSize:10.5,color:'var(--tx3)',marginTop:9,fontWeight:600}}>Auto-dismissing in {grace-popSecs}s</p>
+      </div>
+    </div>
+  );
+};
+
+const App = () => {
+  const [page, setPage]           = useState('login');
+  const [user, setUser]           = useState(null);
+  const [loginTime, setLoginTime] = useState(null);
+  const [tasks, setTasks]         = useState([]);
+  const [activeTimer, setActiveTimer] = useState(null);
+  const [elapsed, setElapsed]     = useState(0);
+  const [notif, setNotif]         = useState(null);
+  const [notifHistory, setNotifHistory] = useState([]);
+  const [darkMode, setDarkMode]   = useState(() => window.safeStorage.getItem('gh_dark') === '1');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  const [themeAccent, setThemeAccent] = useState(() => window.safeStorage.getItem('gh_accent') || 'blue');
+
+  const pushNotif = useCallback((msg, type) => {
+    setNotif({msg, type});
+    setNotifHistory(prev => [{id:Date.now(), msg, type, time:new Date()}, ...prev].slice(0, 10));
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    window.safeStorage.setItem('gh_dark', darkMode ? '1' : '0');
+  }, [darkMode]);
+
+  useEffect(() => {
+    const accents = {
+      blue: { p: '#1a3af5', pd: '#1228d4', pl: darkMode ? 'rgba(77,111,255,0.15)' : 'rgba(26,58,245,0.1)' },
+      purple: { p: '#9333ea', pd: '#7e22ce', pl: darkMode ? 'rgba(168,85,247,0.15)' : 'rgba(147,51,234,0.1)' },
+      emerald: { p: '#10b981', pd: '#059669', pl: darkMode ? 'rgba(52,211,153,0.15)' : 'rgba(16,185,129,0.1)' },
+      rose: { p: '#e11d48', pd: '#be123c', pl: darkMode ? 'rgba(251,113,133,0.15)' : 'rgba(225,29,72,0.1)' },
+      orange: { p: '#f97316', pd: '#ea580c', pl: darkMode ? 'rgba(251,146,60,0.15)' : 'rgba(249,115,22,0.1)' },
+      dark: { p: '#111827', pd: '#030712', pl: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(17,24,39,0.1)' }
+    };
+    const color = accents[themeAccent] || accents.blue;
+    const root = document.documentElement;
+    root.style.setProperty('--p', color.p);
+    root.style.setProperty('--pd', color.pd);
+    root.style.setProperty('--pl', color.pl);
+    window.safeStorage.setItem('gh_accent', themeAccent);
+  }, [themeAccent, darkMode]);
+
+  const toggleDark = () => setDarkMode(d => !d);
+  const toggleMenu = () => setSidebarOpen(prev => !prev);
+
+  useEffect(() => {
+    const saved = window.safeStorage.getItem('gh_user');
+    const lt    = window.safeStorage.getItem('gh_login_time');
+    if (saved) {
+      const u = window.appParse(saved, null);
+      if (u && u.id) {
+        setUser(u);
+        window.ActivityTracker.setUser(u);
+        if (lt) {
+          const d = lt.split('T')[0];
+          if (d === todayStr()) { setLoginTime(lt); }
+          else { const n = new Date().toISOString(); setLoginTime(n); window.safeStorage.setItem('gh_login_time', n); }
+        }
+        setPage('dashboard');
+        window.ActivityTracker.setPage('dashboard');
+        loadTasks(u);
+      } else {
+        window.safeStorage.removeItem('gh_user');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!activeTimer || activeTimer.isPaused) return;
+    const t = setInterval(() => setElapsed(e => e + 1), 1000);
+    return () => clearInterval(t);
+  }, [activeTimer]);
+
+  const loadTasks = async (u) => {
+    const uid = u?.id || user?.id;
+    if (!uid) return;
+    const res = await api.getTasks({userId:uid});
+    if (res.success) setTasks(res.tasks);
+  };
+
+  const handleTasksChanged = (newTaskLocal = null) => {
+    if (newTaskLocal) {
+      setTasks(prev => [...prev, newTaskLocal].sort((a,b) => 
+        cStr(b.date).localeCompare(cStr(a.date)) || 
+        cStr(b.startTime).localeCompare(cStr(a.startTime))
+      ));
+    } else {
+      loadTasks(user);
+    }
+  };
+
+  const doLogin = (u) => {
+    const lt = new Date().toISOString();
+    setUser(u); setLoginTime(lt);
+    window.safeStorage.setItem('gh_user', JSON.stringify(u));
+    window.safeStorage.setItem('gh_login_time', lt);
+    window.ActivityTracker.login(u);
+    window.ActivityTracker.setPage('dashboard');
+    loadTasks(u);
+    setPage('dashboard');
+    pushNotif(`Welcome back, ${u.firstName}! 👋`, 'success');
+  };
+
+  const handleUpdateUser = (updatedUser) => {
+    setUser(updatedUser);
+    window.safeStorage.setItem('gh_user', JSON.stringify(updatedUser));
+    window.ActivityTracker.setUser(updatedUser);
+  };
+
+  const doLogout = async () => {
+    window.ActivityTracker.logout();
+    window.ActivityTracker.flush();
+    setUser(null); setLoginTime(null); setTasks([]); setActiveTimer(null); setElapsed(0);
+    window.safeStorage.removeItem('gh_user'); window.safeStorage.removeItem('gh_login_time');
+    window.ActivityTracker.clearUser();
+    setPage('login');
+  };
+
+  const handleIdleOut = (idleSecs) => {
+    if (activeTimer && !activeTimer.isPaused) {
+      setActiveTimer(p => ({...p, isPaused:true}));
+      pushNotif(`⏸ Timer paused automatically — ${Math.round(idleSecs/60)} min idle`, 'error');
+    }
+  };
+
+  const pages = ['dashboard','tasks','analytics','profile'];
+
+  return (
+    <>
+      {notif && <Notif msg={notif.msg} type={notif.type} onDone={()=>setNotif(null)}/>}
+      {page==='login'     && <LoginPage     onLogin={doLogin} onForgot={()=>setPage('forgot-pw')} darkMode={darkMode} toggleDark={toggleDark}/>}
+      {page==='forgot-pw' && <ForgotPwPage  onBack={()=>setPage('login')} darkMode={darkMode} toggleDark={toggleDark}/>}
+      
+      {pages.includes(page) && user && (
+        <div className="layout">
+          <Sidebar page={page} setPage={setPage} user={user} onLogout={doLogout} darkMode={darkMode} toggleDark={toggleDark} notifHistory={notifHistory} isOpen={sidebarOpen} setIsOpen={setSidebarOpen} themeAccent={themeAccent} setThemeAccent={setThemeAccent}/>
+          <main className="main">
+            <div style={{display:'flex',justifyContent:'flex-end',padding:'10px 34px 0 34px',marginBottom:'-20px'}}>
+              <button onClick={()=>{toggleDark();window.ActivityTracker.themeToggled(darkMode?'light':'dark');}}
+                style={{background:'rgba(136,144,170,.1)',border:'1px solid var(--bd)',padding:'6px 12px',borderRadius:99,cursor:'pointer',color:'var(--tx2)',fontSize:12,fontWeight:700,display:'flex',alignItems:'center',gap:6}}>
+                {darkMode ? '☀ Light Mode' : '🌙 Dark Mode'}
+              </button>
+            </div>
+            {page==='dashboard' && <DashboardPage user={user} tasks={tasks} onTasksChanged={handleTasksChanged} activeTimer={activeTimer} setActiveTimer={setActiveTimer} elapsed={elapsed} setElapsed={setElapsed} loginTime={loginTime} pushNotif={pushNotif} toggleMenu={toggleMenu}/>}
+            {page==='tasks'     && <TasksPage     user={user} tasks={tasks} onTasksChanged={handleTasksChanged} pushNotif={pushNotif} toggleMenu={toggleMenu}/>}
+            {page==='analytics' && <AnalyticsPage user={user} tasks={tasks} toggleMenu={toggleMenu}/>}
+            {page==='profile'   && <ProfilePage   user={user} tasks={tasks} onUpdateUser={handleUpdateUser} pushNotif={pushNotif} toggleMenu={toggleMenu}/>}
+          </main>
+          <IdleWatcher user={user} onIdleOut={handleIdleOut}/>
+        </div>
+      )}
+    </>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
+
